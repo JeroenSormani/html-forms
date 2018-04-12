@@ -643,3 +643,11 @@ span.CodeMirror-selectedtext {
   right: -3px;
   top: 50%;
   margin-top: -5px; }
+
+.file-list .download-file {
+  padding: 10px;
+  background: #f3f3f3;
+  margin-bottom: 10px;
+  border: 1px solid #e8e9e8; }
+  .file-list .download-file input {
+    width: 80%; }
