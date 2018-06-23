@@ -29,8 +29,8 @@ fields = [
     new Field("date", "Date", [ "label", "default-value", "required", "wrap", "add-to-form" ]),
     new Field("textarea", "Textarea", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]),
     new Field("dropdown", "Dropdown", [ "label", "choices", "required", "wrap" ,"add-to-form" ]),
-    new Field("checkboxes", "Checkboxes", [ "label", "choices", "wrap" ,"add-to-form" ]),
-    new Field("radio-buttons", "Radio buttons", [ "label", "choices", "wrap" ,"add-to-form" ]),
+    new Field("checkbox", "Checkboxes", [ "label", "choices", "wrap" ,"add-to-form" ]),
+    new Field("radio", "Radio buttons", [ "label", "choices", "wrap" ,"add-to-form" ]),
     new Field("submit", "Submit button", [ "button-text", "wrap", "add-to-form" ]),
 ];
 

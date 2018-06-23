@@ -23,3 +23,8 @@ tlite(el => el.className.indexOf('hf-tooltip') > -1 );
 
 window.html_forms.FieldBuilder = FieldBuilder;
 window.html_forms.Editor = Editor;
+
+// tell WP common.js to override the method used for determining hidden columns (screen options)
+if( hf_options.view === 'edit' ) {
+	window.columns.useCheckboxesForHidden();
+}

@@ -74,6 +74,11 @@ if (document.getElementById('hf-form-editor')) {
 window.html_forms.FieldBuilder = _fieldBuilder2.default;
 window.html_forms.Editor = _formEditor2.default;
 
+// tell WP common.js to override the method used for determining hidden columns (screen options)
+if (hf_options.view === 'edit') {
+    window.columns.useCheckboxesForHidden();
+}
+
 },{"./action-confirmations.js":1,"./field-builder.js":6,"./form-actions.js":8,"./form-editor.js":9,"./tabs.js":10,"tlite":23}],3:[function(require,module,exports){
 'use strict';
 
@@ -292,6 +297,8 @@ var FieldConfigurator = (_class = function (_Component) {
         key: 'getInitialState',
         value: function getInitialState() {
             return {
+                formId: document.querySelector('input[name="form_id"]').value,
+                formSlug: document.querySelector('input[name="form[slug]"]').value,
                 fieldType: "",
                 fieldLabel: "",
                 placeholder: "",
@@ -311,7 +318,16 @@ var FieldConfigurator = (_class = function (_Component) {
     }, {
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(props) {
-            this.setState({ fieldType: props.fieldType });
+            var newState = { fieldType: props.fieldType };
+
+            // when changing from field that accepts multiple values to single-value field, reset all pre-selections 
+            if (this.state.fieldType === 'checkbox' && props.fieldType !== 'checkbox') {
+                newState.choices = this.state.choices.map(function (c, i) {
+                    c.checked = false;
+                    return c;
+                });
+            }
+            this.setState(newState);
         }
     }, {
         key: 'addToForm',
@@ -393,7 +409,7 @@ var FieldConfigurator = (_class = function (_Component) {
                         break;
 
                     case "choices":
-                        formFields.push((0, _preact.h)(FS.Choices, { multiple: false, choices: state.choices, handlers: this.choiceHandlers }));
+                        formFields.push((0, _preact.h)(FS.Choices, { multiple: state.fieldType === 'checkbox', choices: state.choices, handlers: this.choiceHandlers }));
                         break;
 
                     case "button-text":
@@ -667,7 +683,7 @@ function mount() {
 }
 
 // bootstrap
-fields = [new Field("text", "Text", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("email", "Email", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("url", "URL", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("number", "Number", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("date", "Date", ["label", "default-value", "required", "wrap", "add-to-form"]), new Field("textarea", "Textarea", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("dropdown", "Dropdown", ["label", "choices", "required", "wrap", "add-to-form"]), new Field("checkboxes", "Checkboxes", ["label", "choices", "wrap", "add-to-form"]), new Field("radio-buttons", "Radio buttons", ["label", "choices", "wrap", "add-to-form"]), new Field("submit", "Submit button", ["button-text", "wrap", "add-to-form"])];
+fields = [new Field("text", "Text", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("email", "Email", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("url", "URL", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("number", "Number", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("date", "Date", ["label", "default-value", "required", "wrap", "add-to-form"]), new Field("textarea", "Textarea", ["label", "placeholder", "default-value", "required", "wrap", "add-to-form"]), new Field("dropdown", "Dropdown", ["label", "choices", "required", "wrap", "add-to-form"]), new Field("checkbox", "Checkboxes", ["label", "choices", "wrap", "add-to-form"]), new Field("radio", "Radio buttons", ["label", "choices", "wrap", "add-to-form"]), new Field("submit", "Submit button", ["button-text", "wrap", "add-to-form"])];
 
 exports.default = {
     init: function init() {
@@ -697,7 +713,11 @@ var _preact = require('preact');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function htmlgenerate(conf) {
-    var label = conf.fieldLabel.length && conf.fieldType !== 'submit' ? (0, _preact.h)("label", {}, conf.fieldLabel) : "";
+    var fieldName = namify(conf.fieldLabel);
+    var fieldId = conf.formSlug + '-' + fieldName;
+    var label = conf.fieldLabel.length && conf.fieldType !== 'submit' ? (0, _preact.h)("label", {
+        "for": fieldId
+    }, conf.fieldLabel) : "";
     var fieldAttr = void 0,
         field = void 0;
 
@@ -706,26 +726,29 @@ function htmlgenerate(conf) {
         default:
             fieldAttr = {
                 type: conf.fieldType,
-                name: namify(conf.fieldLabel),
+                name: fieldName,
                 value: conf.value,
                 placeholder: conf.placeholder,
-                required: conf.required
+                required: conf.required,
+                id: fieldId
             };
             field = html("input", fieldAttr);
             break;
         case "textarea":
             fieldAttr = {
-                name: namify(conf.fieldLabel),
+                name: fieldName,
                 placeholder: conf.placeholder,
-                required: conf.required
+                required: conf.required,
+                id: fieldId
             };
             field = html("textarea", fieldAttr, conf.value);
             break;
 
         case "dropdown":
             fieldAttr = {
-                name: namify(conf.fieldLabel),
-                required: conf.required
+                name: fieldName,
+                required: conf.required,
+                id: fieldId
             };
             var opts = conf.choices.map(function (choice) {
                 return html("option", { selected: choice.checked }, choice.label);
@@ -733,22 +756,22 @@ function htmlgenerate(conf) {
             field = html("select", fieldAttr, opts);
             break;
 
-        case "radio-buttons":
+        case "radio":
             field = conf.choices.map(function (choice) {
                 return html("label", {}, [html("input", {
                     type: "radio",
-                    name: namify(conf.fieldLabel),
+                    name: fieldName,
                     value: choice.label,
                     selected: choice.checked
                 }), " ", html("span", {}, choice.label)]);
             });
             break;
 
-        case "checkboxes":
+        case "checkbox":
             field = conf.choices.map(function (choice) {
                 return html("label", {}, [html("input", {
                     type: "checkbox",
-                    name: namify(conf.fieldLabel) + "[]",
+                    name: fieldName + "[]",
                     value: choice.label,
                     checked: choice.checked
                 }), " ", html("span", {}, choice.label)]);
@@ -758,8 +781,9 @@ function htmlgenerate(conf) {
         case "file":
             fieldAttr = {
                 type: "file",
-                name: namify(conf.fieldLabel),
-                required: conf.required
+                name: fieldName,
+                required: conf.required,
+                id: fieldId
             };
 
             if (conf['accept']) {

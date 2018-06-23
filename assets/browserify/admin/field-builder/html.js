@@ -4,7 +4,11 @@ import renderToString from 'preact-render-to-string';
 import { h } from 'preact';
 
 function htmlgenerate(conf) {
-    const label = conf.fieldLabel.length && conf.fieldType !== 'submit' ? h("label", {}, conf.fieldLabel ) : "";
+    const fieldName = namify(conf.fieldLabel); 
+    const fieldId = conf.formSlug + '-' + fieldName;
+    const label = conf.fieldLabel.length && conf.fieldType !== 'submit' ? h("label", {
+        "for": fieldId,
+    }, conf.fieldLabel ) : "";
     let fieldAttr, field;
 
     switch(conf.fieldType) {
@@ -12,26 +16,29 @@ function htmlgenerate(conf) {
         default:
             fieldAttr = {
                 type: conf.fieldType,
-                name: namify(conf.fieldLabel),
+                name: fieldName,
                 value: conf.value,
                 placeholder: conf.placeholder,
                 required: conf.required,
+                id: fieldId,
             };
             field = html("input", fieldAttr);
             break;
         case "textarea":
             fieldAttr = {
-                name: namify(conf.fieldLabel),
+                name: fieldName,
                 placeholder: conf.placeholder,
                 required: conf.required,
+                id: fieldId,
             };
             field = html("textarea", fieldAttr, conf.value);
             break;
 
         case "dropdown":
             fieldAttr = {
-                name: namify(conf.fieldLabel),
+                name: fieldName,
                 required: conf.required,
+                id: fieldId,
             };
             const opts = conf.choices.map((choice) => (
                 html("option", { selected: choice.checked }, choice.label )
@@ -39,12 +46,12 @@ function htmlgenerate(conf) {
             field = html("select", fieldAttr, opts);
             break;
 
-        case "radio-buttons":
+        case "radio":
             field = conf.choices.map((choice) => (
                 html("label", {}, [
                     html("input", {
                         type:"radio",
-                        name: namify(conf.fieldLabel),
+                        name: fieldName,
                         value: choice.label,
                         selected: choice.checked,
                     }),
@@ -54,12 +61,12 @@ function htmlgenerate(conf) {
             ));
             break;
 
-        case "checkboxes":
+        case "checkbox":
             field = conf.choices.map((choice) => (
                 html("label", {}, [
                     html("input", {
                         type: "checkbox",
-                        name: namify(conf.fieldLabel) + "[]",
+                        name: fieldName + "[]",
                         value: choice.label,
                         checked: choice.checked,
                     }),
@@ -72,8 +79,9 @@ function htmlgenerate(conf) {
         case "file":
             fieldAttr = {
                 type: "file",
-                name: namify(conf.fieldLabel),
-                required: conf.required
+                name: fieldName,
+                required: conf.required,
+                id: fieldId,
             };
 
             if(conf['accept']) {
@@ -91,8 +99,6 @@ function htmlgenerate(conf) {
             };
             field = html("input", fieldAttr);
             break;
-
-
 
     }
 

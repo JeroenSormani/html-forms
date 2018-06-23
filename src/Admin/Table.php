@@ -170,6 +170,8 @@ if( class_exists( 'WP_List_Table' ) ) {
                 return sprintf( '<strong>%s</strong>', esc_html( $post->post_title ) );
             }
 
+            $form = hf_get_form( $post );
+
             $edit_link = admin_url( 'admin.php?page=html-forms&view=edit&form_id=' . $post->ID );
             $title      = '<strong><a class="row-title" href="' . $edit_link . '">' . esc_html( $post->post_title ) . '</a></strong>';
 
@@ -181,7 +183,7 @@ if( class_exists( 'WP_List_Table' ) ) {
                 'actions'       => __( 'Actions', 'html-forms' ),
             );
 
-            if( $this->settings['save_submissions'] ) {
+            if( $form->settings['save_submissions'] ) {
                 $tabs['submissions'] = __( 'Submissions', 'html-forms' );
             }
 

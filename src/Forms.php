@@ -89,7 +89,7 @@ class Forms
             return 'spam';
         }
 
-        $was_required = (array) hf_array_get( $data, 'was_required', array() );
+        $was_required = (array) hf_array_get( $data, '_was_required', array() );
         $required_fields = $form->get_required_fields();
         foreach ($required_fields as $field_name) {
             $value = hf_array_get( $data, $field_name );
@@ -241,7 +241,7 @@ class Forms
             $submission->submitted_at = gmdate( 'Y-m-d H:i:s' );
 
             // save submission object so that other form processor have an insert ID to work with (eg file upload)
-            if( $this->settings['save_submissions'] ) {
+            if( $form->settings['save_submissions'] ) {
                  $submission->save();
             }
 
@@ -251,7 +251,7 @@ class Forms
             do_action( 'hf_process_form', $form, $submission );
 
             // re-save submission object for convenience in form processors hooked into hf_process_form
-            if( $this->settings['save_submissions'] ) {
+            if( $form->settings['save_submissions'] ) {
                  $submission->save();
             }
 
@@ -333,7 +333,7 @@ class Forms
                 ob_end_clean();
             }
 
-            http_response_code(200);
+            status_header(200);
             require dirname( $this->plugin_file ) . '/views/form-preview.php';
             exit;
         });

@@ -3,6 +3,16 @@
 <table class="form-table">
 
     <tr valign="top">
+        <th scope="row"><?php _e( 'Save form submissions?', 'html-forms' ); ?></th>
+        <td>
+            <label><input type="radio" name="form[settings][save_submissions]" value="1" <?php checked( $form->settings['save_submissions'], 1 ); ?>> <?php _e( 'Yes' ); ?></label> &nbsp;
+            <label><input type="radio"  name="form[settings][save_submissions]" value="0"  <?php checked( $form->settings['save_submissions'], 0 ); ?>> <?php _e( 'No' ); ?></label>
+
+            <p class="help"><?php _e( 'Select "yes" to store successful form submissions.', 'html-forms' ); ?></p>
+        </td>
+    </tr>
+
+    <tr valign="top">
         <th scope="row"><?php _e( 'Hide form after a successful sign-up?', 'html-forms' ); ?></th>
         <td class="nowrap">
             <label>

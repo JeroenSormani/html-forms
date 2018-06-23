@@ -1,6 +1,6 @@
 'use strict';
 
-import { h, Component, render } from 'preact';
+import { h, Component } from 'preact';
 import { bind } from 'decko';
 import { htmlgenerate } from '../field-builder/html.js';
 import * as FS from './field-settings.js';
@@ -21,6 +21,8 @@ class FieldConfigurator extends Component {
 
     getInitialState() {
        return {
+            formId: document.querySelector('input[name="form_id"]').value,
+            formSlug: document.querySelector('input[name="form[slug]"]').value,
             fieldType: "",
             fieldLabel: "",
             placeholder: "",
@@ -42,7 +44,16 @@ class FieldConfigurator extends Component {
     }
 
     componentWillReceiveProps(props) { 
-        this.setState({ fieldType: props.fieldType })
+        let newState = { fieldType: props.fieldType };
+
+        // when changing from field that accepts multiple values to single-value field, reset all pre-selections 
+        if(this.state.fieldType === 'checkbox' && props.fieldType !== 'checkbox' ) {
+            newState.choices = this.state.choices.map((c, i) => {
+                c.checked = false; 
+                return c; 
+            });
+        }
+        this.setState(newState)
     }
 
     @bind
@@ -131,7 +142,7 @@ class FieldConfigurator extends Component {
                 break;
 
                 case "choices":
-                    formFields.push(<FS.Choices multiple={false} choices={state.choices} handlers={this.choiceHandlers} />);
+                    formFields.push(<FS.Choices multiple={state.fieldType === 'checkbox'} choices={state.choices} handlers={this.choiceHandlers} />);
                 break;
 
                 case "button-text":

@@ -114,7 +114,7 @@ class Email extends Action {
     if( $html_email ) {
       $headers[] = 'Content-Type: text/html';
       $message = nl2br( $message );
-    }
+    } 
 
     if( ! empty( $settings['from'] ) ) {
       $from = hf_replace_data_variables($settings['from'], $submission->data);
