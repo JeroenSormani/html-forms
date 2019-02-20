@@ -56,7 +56,8 @@ function hf_get_form( $form_id_or_slug ) {
         'invalid_email' => __( 'Sorry, that email address looks invalid.', 'html-forms' ),
         'required_field_missing' => __( "Please fill in the required fields.", "html-forms" ),
         'error' => __( 'Oops. An error occurred.', 'html-forms' ),
-    );
+	);
+	$default_messages = apply_filters( 'hf_form_default_messages', $default_messages );
     $messages = array();
     foreach( $post_meta as $meta_key => $meta_values ) {
         if( strpos( $meta_key, 'hf_message_' ) === 0 ) {
@@ -210,11 +211,14 @@ function hf_template( $template ) {
  *
  * @return string
  */
-function hf_replace_data_variables( $string, $data = array() ) {
-    $string = preg_replace_callback( '/\[([a-zA-Z0-9\-\._]+)\]/', function( $matches ) use ( $data ) {
+function hf_replace_data_variables($string, $data = array(), $escape_function = null) {
+    $string = preg_replace_callback( '/\[([a-zA-Z0-9\-\._]+)\]/', function($matches) use ($data, $escape_function) {
         $key = $matches[1];
         $replacement = hf_array_get( $data, $key, '' );
         $replacement = hf_field_value( $replacement );
+        if ($escape_function !== null && is_callable($escape_function)) {
+            $replacement = $escape_function($replacement);
+        }
         return $replacement;
     }, $string );
     return $string;
@@ -235,7 +239,7 @@ function hf_field_value( $value, $limit = 0 ) {
         return $value;
     }
 
-    if( hf_is_file( $value ) ) {
+	if( hf_is_file( $value ) ) {
         $file_url = isset( $value['url'] ) ? $value['url'] : '';
         if( isset( $value['attachment_id'] ) ) {
             $file_url = admin_url( sprintf( 'post.php?action=edit&post=%d', $value['attachment_id'] ) );
@@ -266,6 +270,8 @@ function hf_field_value( $value, $limit = 0 ) {
 
 /**
 * Returns true if value is a "file"
+*
+* @param mixed $value
 * @return bool
 */
 function hf_is_file( $value ) {
@@ -277,6 +283,7 @@ function hf_is_file( $value ) {
 
 /**
 * Returns true if value looks like a date-string submitted from a <input type="date">
+* @param mixed $value
 * @return bool
 * @since 1.3.1
 */

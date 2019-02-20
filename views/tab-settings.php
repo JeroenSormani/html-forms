@@ -33,7 +33,12 @@
         <th scope="row"><label for="hf_form_redirect"><?php _e( 'Redirect to URL after successful sign-ups', 'html-forms' ); ?></label></th>
         <td>
             <input type="text" class="widefat" name="form[settings][redirect_url]" id="hf_form_redirect" placeholder="<?php printf( __( 'Example: %s', 'html-forms' ), esc_attr( site_url( '/thank-you/' ) ) ); ?>" value="<?php echo esc_attr( $form->settings['redirect_url'] ); ?>" />
-            <p class="help"><?php _e( 'Leave empty or enter <code>0</code> for no redirect. Otherwise, use complete (absolute) URLs, including <code>http://</code>.', 'html-forms' ); ?></p>
+            <p class="help">
+                <?php _e( 'Leave empty or enter <code>0</code> for no redirect. Otherwise, use complete (absolute) URLs, including <code>http://</code>.', 'html-forms' ); ?>
+            </p>
+            <p class="help">
+                <?php _e( 'You can use the following variables in the redirect URL: ', 'html-forms' ); ?><span class="hf-field-names"></span>
+            </p>
         </td>
     </tr>
 

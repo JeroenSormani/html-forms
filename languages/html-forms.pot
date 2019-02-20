@@ -1,4 +1,4 @@
-# Copyright (C) 2018 html-forms
+# Copyright (C) 2019 html-forms
 # This file is distributed under the same license as the html-forms package.
 msgid ""
 msgstr ""
@@ -53,7 +53,7 @@ msgstr ""
 msgid "To"
 msgstr ""
 
-#: src/Actions/Email.php:55, src/Admin/Admin.php:343
+#: src/Actions/Email.php:55, src/Admin/Admin.php:345
 msgid "Subject"
 msgstr ""
 
@@ -61,7 +61,7 @@ msgstr ""
 msgid "Your email subject"
 msgstr ""
 
-#: src/Actions/Email.php:62, src/Admin/Admin.php:344
+#: src/Actions/Email.php:62, src/Admin/Admin.php:346
 msgid "Message"
 msgstr ""
 
@@ -121,15 +121,15 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: src/Admin/Admin.php:341
+#: src/Admin/Admin.php:343
 msgid "Your name"
 msgstr ""
 
-#: src/Admin/Admin.php:342
+#: src/Admin/Admin.php:344
 msgid "Your email"
 msgstr ""
 
-#: src/Admin/Admin.php:345
+#: src/Admin/Admin.php:347
 msgid "Send"
 msgstr ""
 

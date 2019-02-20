@@ -70,6 +70,8 @@ function addAction(e) {
 
     // hide "no form actions" message
     actions.querySelector('#hf-form-actions-empty').style.display = 'none';
+
+    window.html_forms.Editor.updateFieldVariables();
 }
 
 function createDeleteActionHandler(wrap) {

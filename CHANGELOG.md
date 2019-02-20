@@ -1,6 +1,42 @@
 Changelog
 =========
 
+#### 1.3.5 - January 29, 2019
+
+**Improvements**
+
+- Allow adding form field variables to the form's redirect URL.
+
+
+#### 1.3.4 - January 9, 2019
+
+**Improvements**
+
+- Reload available field variables when adding action on form settings page.
+- Add role="alert" attribute to all form messages.
+- Emit "message" event whenever message is shown to user.
+
+
+#### 1.3.3 - November 6, 2018
+
+**Fixes**
+
+- Fix selected state of email content type.
+
+**Improvements**
+
+- Add filter & action hook for extending forms with custom messages & message settings.
+- Don't add line-breaks automatically when using HTML emails.
+- Delete all related postmeta when deleting a submission.
+
+
+#### 1.3.2 - Aug 6, 2018
+
+**Improvements**
+
+- Default to an empty string value in conditional fields logic. This allows you to show or hide elements when a field is empty or has not been set yet.
+
+
 #### 1.3.1 - June 12, 2018
 
 **Improvements**

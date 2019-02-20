@@ -20,6 +20,10 @@ function parseUrlParams(q) {
 }
 
 function init() {
+	if (!window.URLSearchParams) {
+		return;
+	}
+
 	// only act on form elements outputted by HTML Forms
 	let forms = [].filter.call(document.forms, (f) => f.className.indexOf('hf-form') > -1);	
 	if(!forms) {

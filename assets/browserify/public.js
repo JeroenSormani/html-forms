@@ -1,6 +1,5 @@
 "use strict";
 
-const shim = require('es5-shim');
 const Loader = require('./form-loading-indicator.js');
 const vars = window.hf_js_vars || { ajax_url: window.location.href };
 const EventEmitter = require('wolfy87-eventemitter');
@@ -20,7 +19,8 @@ function cleanFormMessages(formEl) {
 function addFormMessage(formEl, message) {
     let txtElement = document.createElement('p');
     txtElement.className = 'hf-message hf-message-' + message.type;
-    txtElement.innerHTML = message.text;
+    txtElement.innerHTML = message.text; // uses innerHTML because we allow some HTML strings in the message settings
+    txtElement.setAttribute('role', 'alert');
     formEl.insertBefore(txtElement, formEl.lastElementChild.nextElementSibling);
 }
 
@@ -89,6 +89,7 @@ function createRequestHandler(formEl) {
                 // Show form message
                 if (response.message) {
                     addFormMessage(formEl, response.message);
+                    emitEvent('message', formEl);
                 }
 
                 // Should we hide form?

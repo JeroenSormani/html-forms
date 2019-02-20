@@ -9,8 +9,6 @@
     - HTML template placeholders (for theme developers).
 - Allow sorting submission columns.
 - Require user to be logged in (w/ message for guests) (see Gravity Forms)
-- Action: Subscribe to MailChimp
-- Action: Webhook
 
 
 ## Could

@@ -6,12 +6,13 @@ function getFieldValues(form, fieldName, evt) {
 
     for(let i=0; i<inputs.length; i++) {
         const input = inputs[i];
-        const type = input.getAttribute("type");
+        const type = input.getAttribute("type").toLowerCase();
 
         if( ( type === "radio" || type === "checkbox" ) && ( ! input.checked ) ) {
             continue;
-        }
+        }  
 
+        // ignore buttons which are not clicked (in case there's more than one button with same name)
         if( type === 'button' || type === 'submit' || input.tagName === 'BUTTON' ) {
             if ( ( ! evt || evt.target !== input ) && form.dataset[fieldName] !== input.value ) {
                 continue;
@@ -21,6 +22,13 @@ function getFieldValues(form, fieldName, evt) {
         } 
     
         values.push(input.value);
+    }
+
+    // default to an empty string
+    // can be used to show or hide an element when a field is empty or has not been set 
+    // Usage: data-show-if="FIELDNAME:"
+    if(values.length == 0) {
+        values.push("")
     }
 
     return values;

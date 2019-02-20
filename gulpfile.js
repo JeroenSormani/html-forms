@@ -13,10 +13,6 @@ const insert = require('gulp-insert');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const gutil = require('gulp-util');
-const babel  = require('gulp-babel');
-const es = require('event-stream');
-
-gulp.task('default', ['css', 'js', 'minify-css', 'minify-js', 'pot']);
 
 gulp.task('css', function () {
     let files = './assets/sass/[^_]*.scss';
@@ -28,51 +24,46 @@ gulp.task('css', function () {
         .pipe(gulp.dest('./assets/css'));
 });
 
-gulp.task('js', function() {
-    let files = [
-        './assets/browserify/public.js',
-        './assets/browserify/admin/admin.js',
-    ];
+function js(file) {
+	let filename = file.split('/').pop();
+  	return browserify({ entries: [file] }).on('error', gutil.log)
+		.transform("babelify", {
+			 presets: [
+			 	["@babel/preset-env", { "targets": "> 0.25%, not dead", "forceAllTransforms": true }]
+			 ],
+			 plugins: [
+				["@babel/plugin-proposal-decorators", {"legacy": true }],
+				["@babel/plugin-transform-react-jsx", {"pragma":"h" }]
+			]
+		 })
+		.bundle()
+		.pipe(source(filename))
+		.pipe(buffer())
+		.pipe(insert.wrap('(function () { var require = undefined; var module = undefined; var exports = undefined; var define = undefined;', '; })();'))
+		.pipe(gulp.dest('./assets/js'));
+}
 
-    // map them to our stream function
-    let tasks = files.map(function(entry) {
-        let filename = entry.split('/').pop();
-        return browserify({ entries: [entry] }).on('error', gutil.log)
-            .transform("babelify", {
-                presets: ["es2015"],
-                plugins: [
-                    "transform-decorators-legacy",
-                    ["transform-react-jsx", { "pragma":"h" }]
-                ]
-            })
-            .bundle()
-            .pipe(source(filename))
-            .pipe(buffer())
-            .pipe(insert.wrap('(function () { var require = undefined; var module = undefined; var exports = undefined; var define = undefined;', '; })();'))
-            .pipe(gulp.dest('./assets/js'));
-    });
+gulp.task('js-public', () => js('./assets/browserify/public.js'));
+gulp.task('js-admin', () => js('./assets/browserify/admin/admin.js'));
+gulp.task('js', gulp.parallel('js-public', 'js-admin'));
 
-    // create a merged stream
-    return  es.merge(tasks);
-});
-
-gulp.task('minify-js', ['js'], function() {
+gulp.task('minify-js', gulp.series('js', function() {
     return gulp.src(['./assets/js/**/*.js','!./assets/js/**/*.min.js'])
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(streamify(uglify())).on('error', gutil.log)
         .pipe(rename({extname: '.min.js'}))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('./assets/js'));
-});
+}));
 
-gulp.task('minify-css', ['css'], function() {
+gulp.task('minify-css', gulp.series('css', function() {
     return gulp.src(["./assets/css/*.css", "!./assets/css/*.min.css"])
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(cssmin({ sourceMap: true }))
         .pipe(rename({extname: '.min.css'}))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest("./assets/css"));
-});
+}));
 
 
 gulp.task('pot', function () {
@@ -82,7 +73,9 @@ gulp.task('pot', function () {
         .pipe(gulp.dest(`languages/${domain}.pot`));
 });
 
+gulp.task('default', gulp.series('minify-css', 'minify-js', 'pot'));
+
 gulp.task('watch', function () {
-    gulp.watch('./assets/sass/**/*.scss', ['css']);
-    gulp.watch('./assets/browserify/**/*.js', ['js']);
+    gulp.watch('./assets/sass/**/*.scss', gulp.series('css'));
+    gulp.watch('./assets/browserify/**/*.js', gulp.series('js'));
 });
